@@ -1,10 +1,7 @@
-package com.mdio.br.pokedex.domain;
+package com.mdio.br.pokedex.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class Prediction {
 

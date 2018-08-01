@@ -1,12 +1,10 @@
 package com.mdio.br.pokedex.network;
 
-import com.mdio.br.pokedex.domain.Prediction;
+import com.mdio.br.pokedex.model.Prediction;
 
 import java.util.List;
 
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
