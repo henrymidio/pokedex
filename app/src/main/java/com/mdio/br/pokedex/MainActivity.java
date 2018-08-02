@@ -2,7 +2,9 @@ package com.mdio.br.pokedex;
 
 
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -15,13 +17,15 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.mdio.br.pokedex.camera.CameraPreview;
 import com.mdio.br.pokedex.model.Prediction;
 import com.mdio.br.pokedex.network.WatsonService;
-
+import java.io.IOException;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -86,8 +90,10 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
                         5);
             }
         } else {
-            initCamera();
+            //initCamera();
         }
+
+        initCamera();
 
     }
 
@@ -156,14 +162,14 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
                 try {
 
                     Prediction p = response.body().get(0);
-                    playMedia(p.getClass_(), MainActivity.this);
-                    displayPokemonImage(p.getClass_());
+                    Pokedex.displayPokemonImage(p.getClass_(), preview, MainActivity.this);
+                    mediaPlayer = Pokedex.playMedia(p.getClass_(), MainActivity.this);
                     tvPokemon.clearAnimation();
                     tvPokemon.setText(p.getClass_());
-                    Log.e("pokemon", response.body().size() + "");
+                    Log.e("score", p.getScore() + "");
 
                 } catch (Exception e) {
-                    playMedia("unidentified", MainActivity.this);
+                    mediaPlayer = Pokedex.playMedia("unidentified", MainActivity.this);
                     tvPokemon.clearAnimation();
                     tvPokemon.setText("Pokemon não identificado :(");
                     loading = false;
@@ -173,22 +179,13 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
 
             @Override
             public void onFailure(Call<List<Prediction>> call, Throwable t) {
-                playMedia("unidentified", MainActivity.this);
+                mediaPlayer = Pokedex.playMedia("unidentified", MainActivity.this);
                 tvPokemon.clearAnimation();
                 tvPokemon.setText("Pokemon não identificado :(");
                 loading = false;
                 t.printStackTrace();
             }
         });
-    }
-
-    private void playMedia(String fileName, MediaPlayer.OnCompletionListener callback) {
-
-        mediaPlayer = MediaPlayer.create(this, getRawUri(fileName));
-        mediaPlayer.start();
-
-        mediaPlayer.setOnCompletionListener(callback);
-
     }
 
     @Override
@@ -200,15 +197,5 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         preview.addView(cameraWraper);
     }
 
-    private void displayPokemonImage(String fileName) {
-            int drawableResourceId = this.getResources().getIdentifier(fileName, "drawable", this.getPackageName());
-            preview.removeAllViews();
-            preview.setBackgroundResource(drawableResourceId);
-    }
-
-    private Uri getRawUri(String filename) {
-        int res_sound_id = getResources().getIdentifier(filename, "raw", getPackageName());
-        return Uri.parse("android.resource://" + getPackageName() + "/" +res_sound_id );
-    }
 
 }
